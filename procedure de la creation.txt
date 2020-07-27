@@ -1,0 +1,115 @@
+USE [Smia dyal la bdd dyalk ]
+GO
+/****** Object:  StoredProcedure [dbo].[PS_CreatClient]    Script Date: 26/07/2020 23:50:09 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- CLI : CLIENT TABLE
+-- =============================================
+ --DECLARE @Result Int, @Msg VARCHAR(500);
+ --EXEC @Result =  [dbo].[PS_CreatClient] 1,1,'TEST' , 'TEST' , 1 , 1 , O , 1 , 1 , 'test test test 22 test',,'TEST'
+ --SELECT @Result, @Msg
+-- =============================================
+ALTER PROCEDURE [dbo].[PS_CreatClient](
+        @id_agent            int,
+		@id_compagnie        int,
+		@numero_client	     VARCHAR(15),
+		@nom_client       VARCHAR(250),
+		@is_particulier        tinyint,
+		@is_souscripteur    tinyint,
+		@is_assuree           tinyint,
+		@is_vip  tinyint,
+		@id_categorie_vip int,
+		@adresse_complete          VARCHAR(2000),
+		@date_creation       datetime,
+		@user_creation int,
+        @uuid_client		   VARCHAR(36),
+		@Msg_		   VARCHAR(500) OUTPUT)
+		
+		AS
+BEGIN
+	SET NOCOUNT ON
+	SET IMPLICIT_TRANSACTIONS OFF
+	-- ======================================================================================
+-- START : DECLARATION DES VARIABLES	   								                |	
+-- ======================================================================================
+
+Declare  	@_CommitVar		Int, 
+			@_Msg			Varchar(500)
+		    -- Variables Traitement
+Declare     @_ReturnValue		 Int,
+			@_datesys            DATETIME =getdate()
+-- ======================================================================================
+-- FIN   : DECLARATION DES VARIABLES	   								                |	
+-- ======================================================================================
+-- ======================================================================================
+-- START : Initialisation des variables								                    |	
+-- ======================================================================================
+
+			set @_CommitVar		= 0
+			set @_Msg			= ''
+			set @_ReturnValue	= 0
+-- ======================================================================================
+-- FIN   : Initialisation des variables								                    |	
+-- ======================================================================================
+
+-- ======================================================================================
+-- START : TRANSACTION NAME : PS_create_client											|	
+-- ======================================================================================
+ if ( @@trancount = 0  ) begin
+    set @_CommitVar = 1
+    begin transaction PS_CreatClient
+  end
+
+	----------------------------------------
+	--	START : OPERATION					|	
+    ----------------------------------------
+	 
+	INSERT INTO  [dbo].[cli_clients] (numero_client,nom_client,is_particulier,is_souscripteur,is_assuree,is_vip,adresse_complete,date_creation,user_creation,uuid_client) 
+	values (@numero_client ,@nom_client ,@is_particulier ,@is_souscripteur ,@is_assuree ,@is_vip ,@adresse_complete ,@_datesys ,@user_creation ,@uuid_client)
+	  If ( @@error <> 0 ) Begin
+		set @_Msg = 'Désolé, Problème pendant la création du lien !'
+		goto errTransaction	         
+	End
+
+	select @_ReturnValue = scope_identity()
+
+
+	----------------------------------------
+	--	END : OPERATION						|	
+    ----------------------------------------
+
+	IF ( @_CommitVar = 1 ) BEGIN 
+    
+		COMMIT TRANSACTION PS_CreatClient
+    
+	END
+
+	SET @Msg_ = 'Succès.'
+	RETURN @_ReturnValue
+  
+-- ======================================================================================
+-- END   : TRANSACTION NAME : CLI_create_client									    |	
+-- ======================================================================================
+
+-- ======================================================================================
+-- START : TRANSACTION errTransaction BLOCK                                             |	
+-- ======================================================================================
+
+  
+  errTransaction:
+	  SET @Msg_ = 'PS_CreatClient >>> ' + @_Msg
+  
+	  IF ( @_COMMITVAR = 1 ) BEGIN
+		  ROLLBACK TRANSACTION
+	  END
+  
+  RETURN 0
+	
+-- ======================================================================================
+-- END : TRANSACTION errTransaction BLOCK                                               |	
+-- ======================================================================================
+	
+END
