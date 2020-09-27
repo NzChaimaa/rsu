@@ -26,8 +26,10 @@ $router->add("/:controller/:action/:params", array(
         'action'     => 2,
         'params'     => 3
  ));
+//var_dump($_SERVER);
+//echo substr($_SERVER['REQUEST_URI'],4);
 
-$router->handle($_GET['_url']);
+$router->handle(substr($_SERVER['REQUEST_URI'],4));
 
 return $router;
 

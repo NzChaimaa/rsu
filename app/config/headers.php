@@ -1,7 +1,7 @@
 <?php
 
 
-header("Content-Type: application/json");
+//header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Authorization, Content-Type, Accept, Origin, User-Agent, Cache-Control, X-Requested-With, Access-Control-Allow-Origin");
 header("X-Frame-Options: sameorigin");

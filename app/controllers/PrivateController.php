@@ -18,6 +18,8 @@ abstract class PrivateController extends Controller
 		// Executed after every found action
 		$d = new DateTime(); 
 		//var_dump("afterExecuteRoute : " . $d->format('Y-m-d\TH:i:s.u'));
-    }
+	}
+	
+	
 	
 }
